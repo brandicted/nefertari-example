@@ -131,11 +131,12 @@ def includeme(config):
 
 
 def create_resources(config):
+    from example_api.model import User, Story
     root = config.get_root_resource()
 
     user = root.add(
         'user', 'users',
-        id_name='username',
+        id_name='user_' + User.id_field(),
         factory="example_api.acl.UserACL")
 
     user.add('setting', 'settings',
@@ -144,11 +145,15 @@ def create_resources(config):
 
     root.add('s_one', 's', factory='nefertari.acl.GuestACL')
 
-    story = root.add('story', 'stories', factory="example_api.acl.StoryACL")
+    root.add(
+        'story', 'stories',
+        id_name='story_' + Story.id_field(),
+        factory="example_api.acl.StoryACL")
 
     # admin
     root.add('loglevel', 'loglevels', prefix='admin', view='example_api.views.admin.LogLevelView')
     root.add('setting', 'settings', prefix='admin', view='example_api.views.admin.SettingsView')
+
 
 def initialize():
     from example_api.model import User

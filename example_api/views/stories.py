@@ -24,21 +24,26 @@ class StoriesView(BaseView):
             _raw_terms=self._raw_terms,
             **self._params)
 
-    def show(self, id):
+    def show(self, **kwargs):
         return self.context
 
     def create(self):
         story = Story(**self._params)
         story.save()
-        return JHTTPCreated(
-            location=self.request._route_url('stories', story.id))
+        id_field = Story.id_field()
+        return JHTTPCreated(location=self.request._route_url(
+            'stories', getattr(story, id_field)))
 
-    def update(self, id):
-        story = Story.get_resource(id=id).update(self._params)
-        return JHTTPOk(location=self.request._route_url('stories', story.id))
+    def update(self, **kwargs):
+        id_field = Story.id_field()
+        kwargs = self.resolve_kwargs(kwargs)
+        story = Story.get_resource(**kwargs).update(self._params)
+        return JHTTPOk(location=self.request._route_url(
+            'stories', getattr(story, id_field)))
 
-    def delete(self, id):
-        Story._delete(id=id)
+    def delete(self, **kwargs):
+        kwargs = self.resolve_kwargs(kwargs)
+        Story._delete(**kwargs)
         return JHTTPOk()
 
     def delete_many(self):

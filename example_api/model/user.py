@@ -10,8 +10,8 @@ from pyramid.security import authenticated_userid
 from nefertari.utils import dictset
 from nefertari.json_httpexceptions import *
 from nefertari.engine import (
-    StringField, ChoiceField, PrimaryKeyField, DateTimeField,
-    Relationship, DictField)
+    StringField, ChoiceField, DateTimeField,
+    Relationship, DictField, IdField)
 from nefertari.engine import BaseDocument as NefertariBaseDocument
 
 from example_api.model.base import BaseDocument
@@ -56,7 +56,7 @@ class User(BaseDocument):
         document='Story', ondelete='NULLIFY',
         backref_name='user', backref_ondelete='NULLIFY')
 
-    id = PrimaryKeyField()
+    id = IdField(primary_key=True)
     timestamp = DateTimeField(default=datetime.utcnow)
 
     username = StringField(
@@ -139,7 +139,7 @@ class User(BaseDocument):
         else:
             _d = super(User, self).to_dict(**kw)
 
-        _d['id'] = _d.get('username', None)
+        _d['id'] = _d.get(User.id_field(), None)
         _d['_id'] = self.id
 
         _d.pop('password', None)

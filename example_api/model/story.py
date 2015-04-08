@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from nefertari.engine import (
-    StringField, DateTimeField, PrimaryKeyField, FloatField,
-    BooleanField, ForeignKeyField)
+    StringField, DateTimeField, FloatField,
+    BooleanField, ForeignKeyField, IdField)
 
 from example_api.model.base import ESBaseDocument
 
@@ -11,7 +11,7 @@ class Story(ESBaseDocument):
     __tablename__ = 'stories'
     # _nested_relationships = ['user']
 
-    id = PrimaryKeyField()
+    id = IdField(primary_key=True)
     timestamp = DateTimeField(default=datetime.utcnow)
     creation_date = DateTimeField(default=datetime.utcnow)
     start_date = DateTimeField(default=datetime.utcnow)
@@ -29,6 +29,8 @@ class Story(ESBaseDocument):
     #
     # `ondelete` rules may be kept in both fields with no side-effects
     # when switching engine.
-    user_id = ForeignKeyField(ref_document='User', ref_column='users.id')
+    user_id = ForeignKeyField(
+        ref_document='User', ref_column='users.id',
+        ref_column_type=IdField)
 
     _auth_fields = ['id', 'name']
