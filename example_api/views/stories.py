@@ -1,4 +1,6 @@
 import logging
+from random import random
+
 from nefertari.json_httpexceptions import *
 from pyramid.security import *
 
@@ -7,6 +9,14 @@ from example_api.model import Story
 from example_api.model.base import ES
 
 log = logging.getLogger(__name__)
+
+
+class ArbitraryObject(object):
+    def __init__(self, *args, **kwargs):
+        self.attr = random()
+
+    def to_dict(self, *args, **kwargs):
+        return dict(attr=self.attr)
 
 
 class StoriesView(BaseView):
@@ -29,6 +39,7 @@ class StoriesView(BaseView):
 
     def create(self):
         story = Story(**self._params)
+        story.arbitrary_object = ArbitraryObject()
         story.save()
         id_field = Story.id_field()
         return JHTTPCreated(location=self.request._route_url(

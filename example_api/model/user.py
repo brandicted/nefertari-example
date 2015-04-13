@@ -9,9 +9,7 @@ from pyramid.security import authenticated_userid
 
 from nefertari.utils import dictset
 from nefertari.json_httpexceptions import *
-from nefertari.engine import (
-    StringField, ChoiceField, DateTimeField,
-    Relationship, DictField, IdField, ListField)
+from nefertari import engine as eng
 from nefertari.engine import BaseDocument as NefertariBaseDocument
 
 from example_api.model.base import BaseDocument
@@ -52,33 +50,35 @@ class User(BaseDocument):
     #
     # `ondelete` rules may be kept in both fields with no side-effects
     # when switching engine.
-    stories = Relationship(
+    stories = eng.Relationship(
         document='Story', ondelete='NULLIFY',
         backref_name='owner', backref_ondelete='NULLIFY')
 
-    id = IdField()
-    timestamp = DateTimeField(default=datetime.utcnow)
+    id = eng.IdField()
+    timestamp = eng.DateTimeField(default=datetime.utcnow)
 
-    username = StringField(
+    username = eng.StringField(
         primary_key=True, min_length=1, max_length=50, unique=True,
         processors=[random_uuid, lower_strip])
 
-    email = StringField(unique=True, required=True, processors=[lower_strip])
-    password = StringField(
+    email = eng.StringField(
+        unique=True, required=True,
+        processors=[lower_strip])
+    password = eng.StringField(
         min_length=3, required=True, processors=[crypt_password])
 
-    first_name = StringField(max_length=50, default='')
-    last_name = StringField(max_length=50, default='')
-    last_login = DateTimeField()
+    first_name = eng.StringField(max_length=50, default='')
+    last_name = eng.StringField(max_length=50, default='')
+    last_login = eng.DateTimeField()
 
-    groups = ListField(
-        item_type=StringField,
+    groups = eng.ListField(
+        item_type=eng.StringField,
         choices=['admin', 'user'], default=['user'])
 
-    status = ChoiceField(
+    status = eng.ChoiceField(
         choices=['active', 'inactive', 'blocked'], default='active')
 
-    settings = DictField()
+    settings = eng.DictField()
 
     uid = property(lambda self: str(self.id))
 

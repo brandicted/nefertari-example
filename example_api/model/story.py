@@ -1,8 +1,6 @@
 from datetime import datetime
 
-from nefertari.engine import (
-    StringField, DateTimeField, FloatField,
-    BooleanField, ForeignKeyField, IdField)
+from nefertari import engine as eng
 
 from example_api.model.base import ESBaseDocument
 
@@ -11,15 +9,27 @@ class Story(ESBaseDocument):
     __tablename__ = 'stories'
     # _nested_relationships = ['user']
 
-    id = IdField(primary_key=True)
-    timestamp = DateTimeField(default=datetime.utcnow)
-    creation_date = DateTimeField(default=datetime.utcnow)
-    start_date = DateTimeField(default=datetime.utcnow)
-    due_date = DateTimeField()
-    name = StringField()
-    description = StringField()
-    progress = FloatField(default=0)
-    completed = BooleanField()
+    id = eng.IdField(primary_key=True)
+    timestamp = eng.DateTimeField(default=datetime.utcnow)
+    creation_date = eng.DateTimeField(default=datetime.utcnow)
+    start_date = eng.DateTimeField(default=datetime.utcnow)
+    due_date = eng.DateTimeField()
+    name = eng.StringField()
+    description = eng.TextField()
+    progress = eng.FloatField(default=0)
+    completed = eng.BooleanField()
+
+    signs_number = eng.BigIntegerField()
+    valid_date = eng.DateField()
+    valid_time = eng.TimeField()
+    reads = eng.IntegerField(default=0)
+    rating = eng.SmallIntegerField()
+    available_for = eng.IntervalField()
+    attachment = eng.BinaryField()
+    price = eng.DecimalField(scale=10)
+    arbitrary_object = eng.PickleField()
+    unicode_name = eng.UnicodeField()
+    unicode_description = eng.UnicodeTextField()
 
     # ForeignKeyField is ignored in mongo engine's JSON output
     #
@@ -29,8 +39,8 @@ class Story(ESBaseDocument):
     #
     # `ondelete` rules may be kept in both fields with no side-effects
     # when switching engine.
-    owner_id = ForeignKeyField(
+    owner_id = eng.ForeignKeyField(
         ref_document='User', ref_column='users.username',
-        ref_column_type=StringField)
+        ref_column_type=eng.StringField)
 
     _auth_fields = ['id', 'name']
