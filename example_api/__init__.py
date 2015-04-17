@@ -95,6 +95,8 @@ def main(global_config, **settings):
 
     config.include(includeme)
 
+    config.include('ramses')
+
     from nefertari.engine import setup_database
     setup_database(config)
 

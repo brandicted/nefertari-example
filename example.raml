@@ -1,0 +1,54 @@
+#%RAML 0.8
+---
+title: Example REST API
+documentation:
+  - title: Home
+    content: |
+      Welcome to the example API.
+baseUri: http://{host}:{port}/{version}
+version: v1
+mediaType: application/json
+protocols: [HTTP, HTTPS]
+
+
+/markets:
+  displayName: Old markets
+  get:
+    description: Get all markets
+  post:
+    description: Add new market
+    body:
+      application/json:
+        schema: |
+          {
+            "type": "object",
+            "title": "Market schema",
+            "$schema": "http://json-schema.org/draft-03/schema",
+            "required": true,
+            "properties": {
+              "id": {
+                "required": true,
+                "type": "id_field",
+                "args": {
+                  "primary_key": true
+                }
+              },
+              "name": {
+                "required": true,
+                "type": "string"
+              },
+              "rating": {
+                "required": true,
+                "type": "integer"
+              }
+            }
+          }
+
+  /{id}:
+    displayName: One good market
+    get:
+      description: Get a particular market
+    delete:
+      description: Delete a particular market
+    put:
+      description: Update a particular market

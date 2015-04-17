@@ -7,3 +7,4 @@ pyramid==1.5.4
 waitress==0.8.9
 
 -e .
+-e ../ramses
