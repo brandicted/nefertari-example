@@ -31,7 +31,7 @@ def bootstrap(config):
     root.auth = Settings.asbool('auth')
     root.default_factory = 'nefertari.acl.AdminACL'
 
-    config.include('example_api.model')
+    config.include('example_api.models')
     config.include('nefertari.view')
     config.include('nefertari.elasticsearch')
 
@@ -56,7 +56,7 @@ def bootstrap(config):
     else:
         log.warning('*** USER AUTHENTICATION IS DISABLED ! ***')
         config.add_request_method(
-            'example_api.model.User.get_unauth_user', 'user', reify=True)
+            'example_api.models.User.get_unauth_user', 'user', reify=True)
 
     def _route_url(request, route_name, *args, **kw):
         if config.route_prefix:
@@ -85,8 +85,8 @@ def main(global_config, **settings):
 
     config.include('nefertari.engine')
 
-    from example_api.model import Profile
-    from example_api.model import User
+    from example_api.models import Profile
+    from example_api.models import User
     authn_policy = AuthTktAuthenticationPolicy(
         Settings['auth_tkt_secret'],
         callback=User.get_groups_by_userid,
@@ -136,7 +136,7 @@ def includeme(config):
 
 
 def create_resources(config):
-    from example_api.model import User, Story
+    from example_api.models import User, Story
     root = config.get_root_resource()
 
     user = root.add(
@@ -163,7 +163,7 @@ def create_resources(config):
 
 
 def initialize():
-    from example_api.model import User
+    from example_api.models import User
     import transaction
     log.info('Initializing')
     try:
@@ -186,7 +186,6 @@ def initialize():
             user.save()
             changed = True
         if changed:
-            user.clean(force_all=True)
             transaction.commit()
 
     except KeyError as e:

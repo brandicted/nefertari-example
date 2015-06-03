@@ -1,7 +1,7 @@
 from nefertari.authentication.views import (
     TicketAuthenticationView as NefTicketAuthenticationView)
 
-from example_api.model import User
+from example_api.models import User
 
 
 class TicketAuthenticationView(NefTicketAuthenticationView):

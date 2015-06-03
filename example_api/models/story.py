@@ -2,7 +2,7 @@ from datetime import datetime
 
 from nefertari import engine as eng
 
-from example_api.model.base import ESBaseDocument
+from example_api.models.base import ESBaseDocument
 
 
 class Story(ESBaseDocument):
@@ -19,8 +19,8 @@ class Story(ESBaseDocument):
     due_date = eng.DateTimeField()
     name = eng.StringField(required=True)
     description = eng.TextField(required=True)
-    progress = eng.FloatField(default=0, required=True)
-    completed = eng.BooleanField(required=True)
+    progress = eng.FloatField(default=0)
+    completed = eng.BooleanField()
 
     signs_number = eng.BigIntegerField()
     valid_date = eng.DateField()

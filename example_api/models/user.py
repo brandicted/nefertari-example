@@ -8,7 +8,7 @@ from nefertari import engine as eng
 from nefertari.engine import BaseDocument as NefertariBaseDocument
 from nefertari.authentication.models import AuthModelDefaultMixin
 
-from example_api.model.base import BaseDocument
+from example_api.models.base import BaseDocument
 
 crypt = cryptacular.bcrypt.BCRYPTPasswordManager()
 log = logging.getLogger(__name__)
@@ -22,7 +22,9 @@ def encrypt_password(instance, new_value):
 
 
 def lower_strip(instance, new_value):
-    return (new_value or '').lower().strip()
+    if new_value is None:
+        return new_value
+    return new_value.lower().strip()
 
 
 def random_uuid(instance, new_value):
@@ -78,13 +80,13 @@ class User(AuthModelDefaultMixin, BaseDocument):
 
     username = eng.StringField(
         primary_key=True, min_length=1, max_length=50, unique=True,
-        processors=[random_uuid, lower_strip])
-
+        before_validation=[random_uuid, lower_strip])
     email = eng.StringField(
         unique=True, required=True,
-        processors=[lower_strip])
+        before_validation=[lower_strip])
     password = eng.StringField(
-        min_length=3, required=True, processors=[encrypt_password])
+        min_length=3, required=True,
+        after_validation=[encrypt_password])
 
     first_name = eng.StringField(max_length=50, default='')
     last_name = eng.StringField(max_length=50, default='')

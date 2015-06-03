@@ -3,7 +3,7 @@ from pyramid.security import (
 
 from nefertari.json_httpexceptions import JHTTPNotFound
 from nefertari.acl import BaseACL as NefertariBaseACL
-from example_api.model import User, Story
+from example_api.models import User, Story
 
 
 class BaseACL(NefertariBaseACL):

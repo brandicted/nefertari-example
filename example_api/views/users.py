@@ -3,7 +3,7 @@ from nefertari.json_httpexceptions import (
     JHTTPCreated, JHTTPOk)
 
 from example_api.views.base import BaseView
-from example_api.model import User, Profile
+from example_api.models import User, Profile
 
 
 log = logging.getLogger(__name__)
@@ -25,7 +25,8 @@ class UsersView(BaseView):
     def create(self):
         self._json_params.setdefault('groups', ['user'])
 
-        user = self._model_class(**self._json_params).save()
+        user = self._model_class(**self._json_params)
+        user = user.save(refresh_index=self.refresh_index)
         pk_field = self._model_class.pk_field()
 
         return JHTTPCreated(
@@ -46,7 +47,7 @@ class UsersView(BaseView):
 
         if 'reset' in self._json_params:
             self._json_params.pop('reset', '')
-        user.update(self._json_params)
+        user.update(self._json_params, refresh_index=self.refresh_index)
 
         pk_field = self._model_class.pk_field()
         return JHTTPOk(location=self.request._route_url(
@@ -57,7 +58,8 @@ class UsersView(BaseView):
 
     def delete(self, **kwargs):
         kwargs = self.resolve_kwargs(kwargs)
-        self._model_class._delete(**kwargs)
+        story = self._model_class.get_resource(**kwargs)
+        story.delete(refresh_index=self.refresh_index)
         return JHTTPOk()
 
 
@@ -81,7 +83,8 @@ class UserAttributesView(BaseView):
         obj.update_iterables(
             self._json_params, self.attr,
             unique=self.unique,
-            value_type=self.value_type)
+            value_type=self.value_type,
+            refresh_index=self.refresh_index)
         return JHTTPCreated(resource=getattr(obj, self.attr, None))
 
 
@@ -96,8 +99,9 @@ class UserProfileView(BaseView):
     def create(self, **kwargs):
         kwargs = self.resolve_kwargs(kwargs)
         obj = User.get_resource(**kwargs)
-        profile = self._model_class(**self._json_params).save()
-        obj.update({'profile': profile})
+        profile = self._model_class(**self._json_params)
+        profile = profile.save(refresh_index=self.refresh_index)
+        obj.update({'profile': profile}, refresh_index=self.refresh_index)
         return JHTTPCreated(
             resource=obj.profile.to_dict(),
             request=self.request
@@ -106,7 +110,8 @@ class UserProfileView(BaseView):
     def update(self, **kwargs):
         kwargs = self.resolve_kwargs(kwargs)
         user = User.get_resource(**kwargs)
-        user.profile.update(self._json_params)
+        user.profile.update(
+            self._json_params, refresh_index=self.refresh_index)
 
         pk_field = User.pk_field()
         return JHTTPOk(location=self.request._route_url(
