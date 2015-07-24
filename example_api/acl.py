@@ -1,5 +1,4 @@
-from pyramid.security import (
-    Allow, Everyone, Deny, ALL_PERMISSIONS)
+from pyramid.security import Allow, Everyone, ALL_PERMISSIONS
 
 from nefertari.json_httpexceptions import JHTTPNotFound
 from nefertari.acl import BaseACL as NefertariBaseACL
@@ -29,27 +28,18 @@ class UserACL(BaseACL):
           to everyone.
     """
     __context_class__ = User
+    __item_acl__ = [(Allow, Everyone, ['show', 'item_options'])]
 
     def __init__(self, request):
         super(UserACL, self).__init__(request)
         self.acl = (
-            Allow, Everyone, ['index', 'create', 'show', 'collection_options',
-                              'item_options'])
-
-    def context_acl(self, context):
-        return [
-            (Allow, str(context.id), 'update'),
-            (Allow, Everyone, ['index', 'show', 'collection_options',
-                               'item_options']),
-            (Deny, str(context.id), 'delete'),
-        ]
+            Allow, Everyone, ['index', 'create', 'collection_options'])
 
     def __getitem__(self, key):
         if not self.user:
             raise JHTTPNotFound
 
         obj = self.user
-        obj.__acl__ = self.context_acl(obj)
         obj.__parent__ = self
         obj.__name__ = key
         return obj
@@ -57,23 +47,17 @@ class UserACL(BaseACL):
 
 class StoryACL(BaseACL):
     __context_class__ = Story
+    __item_acl__ = [
+        (Allow, 'g:admin', ALL_PERMISSIONS),
+        (Allow, Everyone, ['show', 'item_options']),
+    ]
 
     def __init__(self, request):
         super(StoryACL, self).__init__(request)
-        self.acl = (
-            Allow, Everyone, ['index', 'show', 'collection_options',
-                              'item_options'])
-
-    def context_acl(self, context):
-        return [
-            (Allow, 'g:admin', ALL_PERMISSIONS),
-            (Allow, Everyone, ['index', 'show', 'collection_options',
-                               'item_options']),
-        ]
+        self.acl = (Allow, Everyone, ['index', 'collection_options'])
 
     def __getitem__(self, key):
         obj = Story.get(id=key, __raise=True)
-        obj.__acl__ = self.context_acl(obj)
         obj.__parent__ = self
         obj.__name__ = key
         return obj

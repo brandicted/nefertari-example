@@ -21,6 +21,7 @@ elasticsearch.chunk_size = 1000
 elasticsearch.enable_refresh_query = true
 elasticsearch.enable_aggregations = true
 elasticsearch.enable_polymorphic_query = true
+elasticsearch.acl_filtering = true
 
 # example_api
 host = localhost
