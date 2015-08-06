@@ -34,7 +34,7 @@ class User(AuthUserMixin, BaseDocument):
     __tablename__ = 'users'
 
     _nested_relationships = ['profile']
-    _auth_fields = ['id', 'username', 'first_name', 'last_name', 'stories']
+    _auth_fields = ['username', 'first_name', 'last_name', 'stories']
     _public_fields = ['username']
 
     updated_at = eng.DateTimeField(onupdate=datetime.utcnow)

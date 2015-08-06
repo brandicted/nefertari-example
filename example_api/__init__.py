@@ -35,7 +35,7 @@ def bootstrap(config):
     config.include('nefertari.elasticsearch')
     config.include('nefertari.json_httpexceptions')
 
-    enable_selfalias(config, "username")
+    enable_selfalias(config, 'user_username')
 
     if Settings.asbool('enable_get_tunneling'):
         config.add_tween('nefertari.tweens.get_tunneling')

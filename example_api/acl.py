@@ -5,19 +5,7 @@ from nefertari.acl import BaseACL as NefertariBaseACL
 from example_api.models import User, Story
 
 
-class BaseACL(NefertariBaseACL):
-    def __init__(self, request):
-        super(BaseACL, self).__init__(request)
-        pk_field = User.pk_field()
-        arg = request.matchdict.get('user_' + pk_field)
-
-        if arg and arg != 'self':
-            self.user = User.get(**{pk_field: arg, '__raise': True})
-        else:
-            self.user = request.user
-
-
-class UserACL(BaseACL):
+class UserACL(NefertariBaseACL):
     """ User level ACL mixin. Mix it with your ACL class that sets
     ``self.user`` to a currently authenticated user.
 
@@ -36,6 +24,13 @@ class UserACL(BaseACL):
             Allow, Everyone, ['index', 'create', 'collection_options'])
 
     def __getitem__(self, key):
+        pk_field = User.pk_field()
+        key = self.resolve_self_key(key)
+        if key == 'self' and self.request.user:
+            self.user = self.request.user
+        else:
+            self.user = User.get(**{pk_field: key, '__raise': True})
+
         if not self.user:
             raise JHTTPNotFound
 
@@ -45,7 +40,7 @@ class UserACL(BaseACL):
         return obj
 
 
-class StoryACL(BaseACL):
+class StoryACL(NefertariBaseACL):
     __context_class__ = Story
     __item_acl__ = [
         (Allow, 'g:admin', ALL_PERMISSIONS),
