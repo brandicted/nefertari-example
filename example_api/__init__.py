@@ -28,7 +28,7 @@ def bootstrap(config):
     config.include('nefertari')
 
     root = config.get_root_resource()
-    root.default_factory = 'nefertari.acl.AdminACL'
+    root.default_factory = 'nefertari.acl.RootACL'
 
     config.include('example_api.models')
     config.include('nefertari.view')
@@ -85,6 +85,7 @@ def main(global_config, **settings):
     )
 
     config.include('nefertari.engine')
+    config.include('nefertari_guards')
 
     from example_api.models import Profile
     from example_api.models import User
@@ -138,27 +139,26 @@ def create_resources(config):
     user = root.add(
         'user', 'users',
         id_name='user_username',
-        factory="example_api.acl.UserACL")
+        factory="example_api.acl.UsersACL")
 
     user.add('group', 'groups',
              view='example_api.views.users.UserAttributesView',
-             factory="example_api.acl.UserACL")
+             factory="example_api.acl.UsersACL")
     user.add('setting', 'settings',
              view='example_api.views.users.UserAttributesView',
-             factory="example_api.acl.UserACL")
+             factory="example_api.acl.UsersACL")
     user.add('profile',
              view='example_api.views.users.UserProfileView',
-             factory="example_api.acl.UserACL")
+             factory="example_api.acl.UsersACL")
 
     root.add(
         'story', 'stories',
         id_name='story_id',
-        factory="example_api.acl.StoryACL")
+        factory="example_api.acl.StoriesACL")
 
 
 def initialize():
     from example_api.models import User
-    from pyramid.security import Allow, ALL_PERMISSIONS
     import transaction
     log.info('Initializing')
     try:
@@ -172,7 +172,6 @@ def initialize():
                 password=s_pass,
                 email=s_email,
                 groups=['admin'],
-                _acl=[(Allow, 'g:admin', ALL_PERMISSIONS)],
             ))
         changed = created
         if not created and Settings.asbool('system.reset'):
