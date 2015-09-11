@@ -3,6 +3,7 @@ Paste==2.0.2
 pyramid==1.5.7
 waitress==0.8.9
 
+nefertari-guards
 nefertari==0.5.1
 nefertari-mongodb==0.3.3
 nefertari-sqla==0.3.3

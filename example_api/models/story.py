@@ -2,9 +2,10 @@ from datetime import datetime
 
 from nefertari import engine as eng
 from nefertari.engine import ESBaseDocument
+from nefertari_guards.engine import DocumentACLMixin
 
 
-class Story(ESBaseDocument):
+class Story(DocumentACLMixin, ESBaseDocument):
     __tablename__ = 'stories'
 
     _auth_fields = [

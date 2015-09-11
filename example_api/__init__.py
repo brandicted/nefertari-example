@@ -86,6 +86,7 @@ def main(global_config, **settings):
     )
 
     config.include('nefertari.engine')
+    config.include('nefertari_guards')
 
     from example_api.models import Profile
     from example_api.models import User
