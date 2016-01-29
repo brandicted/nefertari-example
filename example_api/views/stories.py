@@ -20,7 +20,7 @@ class StoriesView(BaseView):
     Model = Story
 
     def index(self):
-        return self.get_collection_es()
+        return self.Model.get_collection(**self._query_params)
 
     def show(self, **kwargs):
         return self.context
@@ -35,24 +35,26 @@ class StoriesView(BaseView):
 
     def update(self, **kwargs):
         story = self.Model.get_item(
+            _query_secondary=False,
             id=kwargs.pop('story_id'), **kwargs)
-        return story.update(self._json_params, self.request)
+        return story.update(self._json_params, request=self.request)
 
     def replace(self, **kwargs):
         return self.update(**kwargs)
 
     def delete(self, **kwargs):
         story = self.Model.get_item(
+            _query_secondary=False,
             id=kwargs.pop('story_id'), **kwargs)
         story.delete(self.request)
 
     def delete_many(self):
-        es_stories = self.get_collection_es()
-        stories = self.Model.filter_objects(es_stories)
+        stories = self.Model.get_collection(
+            _query_secondary=False, **self._query_params)
         return self.Model._delete_many(stories, self.request)
 
     def update_many(self):
-        es_stories = self.get_collection_es()
-        stories = self.Model.filter_objects(es_stories)
+        stories = self.Model.get_collection(
+            _query_secondary=False, **self._query_params)
         return self.Model._update_many(
             stories, self._json_params, self.request)

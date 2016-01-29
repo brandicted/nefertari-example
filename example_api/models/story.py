@@ -1,10 +1,10 @@
 from datetime import datetime
 
 from nefertari import engine as eng
-from nefertari.engine import ESBaseDocument
+from nefertari.engine import BaseDocument
 
 
-class Story(ESBaseDocument):
+class Story(BaseDocument):
     __tablename__ = 'stories'
 
     _auth_fields = [

@@ -33,7 +33,6 @@ def bootstrap(config):
 
     config.include('example_api.models')
     config.include('nefertari.view')
-    config.include('nefertari.elasticsearch')
     config.include('nefertari.json_httpexceptions')
 
     enable_selfalias(config, 'user_username')
@@ -100,13 +99,10 @@ def main(global_config, **settings):
     from nefertari.engine import setup_database
     setup_database(config)
 
-    from nefertari.elasticsearch import ES
-    ES.setup_mappings()
-
     setup_event_handlers(config)
 
     config.commit()
-    initialize()
+    initialize(config)
 
     return config.make_wsgi_app()
 
@@ -160,7 +156,7 @@ def create_resources(config):
         factory="example_api.acl.StoriesACL")
 
 
-def initialize():
+def initialize(config):
     from example_api.models import User
     import transaction
     crypt = cryptacular.bcrypt.BCRYPTPasswordManager()
@@ -171,6 +167,7 @@ def initialize():
         s_email = Settings['system.email']
         log.info('Creating system user')
         user, created = User.get_or_create(
+            request=config,
             username=s_user,
             defaults=dict(
                 password=s_pass,
