@@ -114,6 +114,19 @@ def main(global_config, **settings):
 def setup_event_handlers(config):
     config.include('nefertari.authentication')
 
+    from nefertari import events
+    from example_api.models import User
+
+    def hide_user_passwords(event):
+        if event.view._auth_enabled:
+            event.set_field_value('password', 'VERY_SECRET')
+
+    config.subscribe_to_events(
+        hide_user_passwords,
+        [events.AfterIndex, events.AfterShow],
+        model=User,
+    )
+
 
 def includeme(config):
     log.info("%s %s" % (APP_NAME, __version__))
